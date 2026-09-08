@@ -123,7 +123,8 @@ class TeamManagementService:
             return ActionResult(False, "添加失败", "该选手尚未绑定飞书账号，暂时无法发送组队确认卡片。")
         if target.record_id in team.all_member_ids:
             return ActionResult(False, "添加失败", "该选手已经在当前队伍中。")
-        if await self._team_for(target.record_id):
+        existing_team = await self._team_for(target.record_id)
+        if existing_team is not None and len(existing_team.all_member_ids) != 1:
             return ActionResult(False, "添加失败", "该选手已经在其他队伍中。")
         if not await self._team_has_freshman_async(team) and target.grade != "大一":
             return ActionResult(False, "添加失败", "当前队伍缺少大一新生，必须先添加大一新生。")
@@ -183,7 +184,10 @@ class TeamManagementService:
                 if not target.verified or not target.approved:
                     self.pending.pop(change_id, None)
                     return ActionResult(False, "变更失败", "该选手的验证或审核状态已发生变化。")
-                if await self._team_for(target.record_id):
+                existing_team = await self._team_for(target.record_id)
+                if (existing_team is not None
+                        and existing_team.record_id != team.record_id
+                        and len(existing_team.all_member_ids) != 1):
                     self.pending.pop(change_id, None)
                     return ActionResult(False, "变更失败", "该选手已经加入其他队伍。")
                 if len(team.all_member_ids) >= 5:
@@ -192,12 +196,23 @@ class TeamManagementService:
                 if not await self._team_has_freshman_async(team) and target.grade != "大一":
                     self.pending.pop(change_id, None)
                     return ActionResult(False, "变更失败", "当前队伍缺少大一新生，必须先添加大一新生。")
-                await self.teams.batch_update([(team.record_id, {
+                updates = []
+                if existing_team is not None and existing_team.record_id != team.record_id:
+                    # 一人临时队伍允许被新队伍接收；移除其唯一队长后，旧队伍自然变为空队伍。
+                    updates.append((existing_team.record_id, {
+                        "captain_ids": [],
+                        "member_ids": [rid for rid in existing_team.member_ids
+                                       if rid != target.record_id],
+                        "manual_member_ids": [rid for rid in existing_team.manual_member_ids
+                                               if rid != target.record_id],
+                    }))
+                updates.append((team.record_id, {
                     "manual_member_ids": list(dict.fromkeys(
                         team.manual_member_ids + [target.record_id])),
                     "removed_member_ids": [rid for rid in team.removed_member_ids
                                            if rid != target.record_id],
-                })])
+                }))
+                await self.teams.batch_update(updates)
             else:
                 if target.record_id not in team.all_member_ids or target.record_id in team.captain_ids:
                     self.pending.pop(change_id, None)

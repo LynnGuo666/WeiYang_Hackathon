@@ -109,13 +109,29 @@ class TeamManagementServiceTests(unittest.TestCase):
     def test_add_rejects_target_already_in_another_team(self):
         self.teams = FakeTeams([
             Team(record_id="team-1", team_no="T-1", captain_ids=["c1"]),
-            Team(record_id="team-2", team_no="T-2", captain_ids=["c3"]),
+            Team(record_id="team-2", team_no="T-2", captain_ids=["c3"],
+                 manual_member_ids=["c2"]),
         ])
         self.service = TeamManagementService(self.contestants, self.teams)
         result = asyncio.run(self.service.start_add("ou-captain", "13800000003"))
 
         self.assertFalse(result.ok)
         self.assertIn("其他队伍", result.reason)
+
+    def test_add_can_transfer_contestant_from_one_person_team(self):
+        solo_team = Team(record_id="solo-team", team_no="T-SOLO", captain_ids=["c2"])
+        target_team = Team(record_id="team-1", team_no="T-1", captain_ids=["c1"],
+                           manual_member_ids=["c3"])
+        self.teams = FakeTeams([solo_team, target_team])
+        self.service = TeamManagementService(self.contestants, self.teams)
+
+        start = asyncio.run(self.service.start_add("ou-captain", "13800000002"))
+        self.assertTrue(start.ok)
+        confirmed = asyncio.run(self.service.confirm(start.change_id, "ou-freshman"))
+
+        self.assertTrue(confirmed.ok)
+        self.assertEqual(self.teams.rows["solo-team"].all_member_ids, [])
+        self.assertEqual(self.teams.rows["team-1"].all_member_ids, ["c1", "c3", "c2"])
 
     def test_existing_freshman_allows_ordinary_member(self):
         self.teams = FakeTeams([Team(record_id="team-1", team_no="T-1",

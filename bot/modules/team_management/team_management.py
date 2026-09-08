@@ -209,7 +209,7 @@ class TeamManagementPlugin(Plugin):
     dependencies = ()
 
     def setup(self) -> None:
-        REGISTRY.user_command("组队", "我的队伍", plugin=self.name)(handle_team)
+        REGISTRY.user_command("组队", "组队管理", "我的队伍", plugin=self.name)(handle_team)
         REGISTRY.user_command("创建队伍", plugin=self.name)(handle_create)
         REGISTRY.user_command("添加队员", plugin=self.name, accepts_args=True)(handle_add_command)
         REGISTRY.on_card("team", scope="user", plugin=self.name)(handle_team)
