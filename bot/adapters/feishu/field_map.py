@@ -61,8 +61,9 @@ TEAM = TableMap(
         "captain_ids": F.T_CAPTAIN,
         "member_ids": F.T_MEMBERS,
         "manual_member_ids": F.T_MANUAL_MEMBERS,
+        "removed_member_ids": F.T_REMOVED_MEMBERS,
     },
-    links=frozenset({"captain_ids", "member_ids", "manual_member_ids"}),
+    links=frozenset({"captain_ids", "member_ids", "manual_member_ids", "removed_member_ids"}),
 )
 
 PROJECT = TableMap(

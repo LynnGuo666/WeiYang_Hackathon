@@ -71,11 +71,13 @@ class Team:
     captain_ids: list[str] = field(default_factory=list)   # 队长（选手 record_id）
     member_ids: list[str] = field(default_factory=list)    # 队友（报名产生，选手 record_id）
     manual_member_ids: list[str] = field(default_factory=list)  # 管理员手动增加的队友
+    removed_member_ids: list[str] = field(default_factory=list)  # 手动移除且同步不得恢复的队友
 
     @property
     def all_member_ids(self) -> list[str]:
         """队伍完整成员，按队长、报名队友、手动队友合并去重。"""
-        return list(dict.fromkeys(self.captain_ids + self.member_ids + self.manual_member_ids))
+        members = list(dict.fromkeys(self.captain_ids + self.member_ids + self.manual_member_ids))
+        return [rid for rid in members if rid not in self.removed_member_ids]
 
 
 @dataclass

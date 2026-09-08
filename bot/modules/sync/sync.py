@@ -223,10 +223,15 @@ async def _run_sync_impl() -> dict:
     t_create, t_update = [], []
     for rid, t in team_rows.items():
         captain = [t["_owner"]] if t["_owner"] else []
-        members = list(t["_members"])
-        if rid in existing_teams:
-            t_update.append((existing_teams[rid].record_id,
-                             {"captain_ids": captain, "member_ids": members, "manual_member_ids": existing_teams[rid].manual_member_ids}))
+        existing = existing_teams.get(rid)
+        removed = set(existing.removed_member_ids) if existing else set()
+        members = [member_id for member_id in t["_members"] if member_id not in removed]
+        if existing is not None:
+            fields = {"captain_ids": captain, "member_ids": members,
+                      "manual_member_ids": existing.manual_member_ids}
+            if existing.removed_member_ids:
+                fields["removed_member_ids"] = existing.removed_member_ids
+            t_update.append((existing.record_id, fields))
         else:
             t_create.append({"team_no": t["team_no"], "reg_record_id": t["reg_record_id"],
                              "preformed": t["preformed"], "agree_assign": t["agree_assign"],

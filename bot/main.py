@@ -27,6 +27,7 @@ from .modules.admin import AdminJobsPlugin, AdminPlugin
 from .modules.group.group import GroupPlugin
 from .modules.sync.sync import SyncPlugin
 from .modules.team_submission import TeamSubmissionPlugin
+from .modules.team_management.team_management import TeamManagementPlugin
 from .modules.user import (ActivityPlugin, AuthPlugin, ProfilePlugin,
                            ScorePlugin, VotePlugin)
 
@@ -146,6 +147,7 @@ def setup_plugins() -> None:
     PLUGIN_MANAGER.register(
         SyncPlugin(),
         TeamSubmissionPlugin(),
+        TeamManagementPlugin(),
         GroupPlugin(),
         VotePlugin(),
         ScorePlugin(),

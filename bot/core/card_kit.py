@@ -33,6 +33,8 @@ def guide_card(is_admin_user: bool = False) -> dict:
     user_cmds = [
         "- `验证` —— 绑定飞书账号与报名信息，审核通过后自动拉入交流群",
         "- `个人中心` —— 我的选手 ID、队伍、项目提交状态",
+        "- `组队` —— 查看队伍并创建、添加或删除成员",
+        "- `添加队员 <手机号>` —— 向指定手机号发送组队确认邀请",
         "- `活跃` —— 群发言活跃度排行（加「今天」看当日）",
         "- `投票` —— 决赛投票（一人一票）",
         "- `票数` —— 查看当前票榜",
@@ -71,6 +73,12 @@ def guide_card(is_admin_user: bool = False) -> dict:
         {"tag": "column_set", "flex_mode": "bisect", "columns": [
             {"tag": "column", "width": "weighted", "weight": 1, "elements": [
                 btn("📊 查看票榜", "votes_board")],
+             "horizontal_align": "left"},
+            {"tag": "column", "width": "weighted", "weight": 1, "elements": []},
+        ]},
+        {"tag": "column_set", "flex_mode": "bisect", "columns": [
+            {"tag": "column", "width": "weighted", "weight": 1, "elements": [
+                btn("👥 组队管理", "team", "primary")],
              "horizontal_align": "left"},
             {"tag": "column", "width": "weighted", "weight": 1, "elements": []},
         ]},

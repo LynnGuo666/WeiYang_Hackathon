@@ -306,6 +306,7 @@ def _to_team(rec: dict) -> Team:
         captain_ids=cells.link_ids(f.get(F.T_CAPTAIN)),
         member_ids=cells.link_ids(f.get(F.T_MEMBERS)),
         manual_member_ids=cells.link_ids(f.get(F.T_MANUAL_MEMBERS)),
+        removed_member_ids=cells.link_ids(f.get(F.T_REMOVED_MEMBERS)),
     )
 
 
