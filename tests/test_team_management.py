@@ -2,6 +2,7 @@ import asyncio
 import unittest
 from types import SimpleNamespace
 
+from bot.core.card_kit import guide_card
 from bot.core.models import Contestant, Team
 from bot.modules.team_management.cards import add_form_card, delete_form_card, no_team_card
 from bot.modules.team_management.service import TeamManagementService
@@ -178,6 +179,23 @@ class TeamManagementServiceTests(unittest.TestCase):
         select = delete["body"]["elements"][0]["elements"][0]
         self.assertEqual(select["tag"], "select_static")
         self.assertEqual(select["options"][0]["value"], "c2")
+
+    def test_guide_shortcuts_are_mobile_friendly_and_include_team_management(self):
+        elements = guide_card()["body"]["elements"]
+        shortcut_rows = [element for element in elements
+                         if element.get("tag") == "column_set"]
+
+        self.assertEqual(len(shortcut_rows), 3)
+        self.assertTrue(all(len(row["columns"]) <= 2 for row in shortcut_rows))
+        actions = [
+            column["elements"][0]["behaviors"][0]["value"]["action"]
+            for row in shortcut_rows
+            for column in row["columns"]
+            if column["elements"]
+        ]
+        self.assertEqual(actions, [
+            "verify", "profile", "team", "vote", "activity", "votes_board",
+        ])
 
 
 if __name__ == "__main__":

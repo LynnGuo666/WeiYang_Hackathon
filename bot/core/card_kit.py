@@ -54,30 +54,29 @@ def guide_card(is_admin_user: bool = False) -> dict:
     ]
     elements = [
         {"tag": "markdown", "content": "**快捷操作**（点按钮即可，无需打字）"},
-        {"tag": "column_set", "flex_mode": "trisect", "columns": [
+        {"tag": "column_set", "flex_mode": "bisect", "columns": [
             {"tag": "column", "width": "weighted", "weight": 1, "elements": [
                 btn("✅ 验证身份", "verify", "primary")],
              "horizontal_align": "left"},
             {"tag": "column", "width": "weighted", "weight": 1, "elements": [
                 btn("👤 个人中心", "profile")],
              "horizontal_align": "left"},
+        ]},
+        {"tag": "column_set", "flex_mode": "bisect", "columns": [
             {"tag": "column", "width": "weighted", "weight": 1, "elements": [
                 btn("👥 组队管理", "team")],
              "horizontal_align": "left"},
-        ]},
-        {"tag": "column_set", "flex_mode": "bisect", "columns": [
             {"tag": "column", "width": "weighted", "weight": 1, "elements": [
                 btn("🗳️ 去投票", "vote")],
              "horizontal_align": "left"},
-            {"tag": "column", "width": "weighted", "weight": 1, "elements": [
-                btn("🔥 活跃度排行", "activity")],
-             "horizontal_align": "left"},
         ]},
         {"tag": "column_set", "flex_mode": "bisect", "columns": [
             {"tag": "column", "width": "weighted", "weight": 1, "elements": [
+                btn("🔥 活跃度排行", "activity")],
+             "horizontal_align": "left"},
+            {"tag": "column", "width": "weighted", "weight": 1, "elements": [
                 btn("📊 查看票榜", "votes_board")],
              "horizontal_align": "left"},
-            {"tag": "column", "width": "weighted", "weight": 1, "elements": []},
         ]},
         {"tag": "hr"},
         {"tag": "markdown", "content": "**全部指令**\n" + "\n".join(user_cmds)},
