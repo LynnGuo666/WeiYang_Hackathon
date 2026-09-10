@@ -106,6 +106,8 @@ def merge_contestants(registrations: list[Registration]) -> dict[str, dict]:
             pick("专业", app["major"])
             pick("年级", app["grade"])
             pick("身份", app["identity"])
+            # 报名记录ID：主报名人行优先（选手表回溯报名用）
+            pick("报名记录ID", record_id)
             if is_owner or not p.get("意向角色"):
                 p["意向角色"] = app["intent"]
             # 审核状态：任一队伍「审核通过」即通过；否则任一「审核不通过」即不通过；否则未审核
@@ -180,6 +182,8 @@ async def _run_sync_impl() -> dict:
             row["identity"] = p["身份"]
         if p.get("意向角色"):
             row["intent_roles"] = p["意向角色"]
+        if p.get("报名记录ID"):
+            row["reg_record_id"] = p["报名记录ID"]
         old = by_phone.get(phone)
         if old is not None:
             diff = {k: v for k, v in row.items() if _field_changed(old, k, v)}
